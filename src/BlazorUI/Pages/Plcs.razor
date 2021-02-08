@@ -1,0 +1,147 @@
+﻿@page "/plcs"
+
+@using MediatR
+@using Clean_Architecture.Application.Plcs.Queries.GetPlcs
+@using Clean_Architecture.Application.Plcs.Commands.CreatePlc
+
+@inject IMediator Mediator
+
+<h3>PLCS</h3>
+
+<div class="container">
+
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>PLC ID</th>
+                    <th>IP</th>
+                    <th>Rack</th>
+                    <th>Slot</th>
+                    <th>Delete Product</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (PlcList.PlcLists.Any())
+                {
+                    @foreach (var plc in PlcList.PlcLists)
+                    {
+                        <tr @onclick="(() => SetPlcForUpdate(plc))">
+                            <td>@plc.Id</td>
+                            <td>@plc.IpAddress</td>
+                            <td>@plc.Rack</td>
+                            <td>@plc.Slot</td>
+                            <td><button class="btn btn-danger" @onclick="(() => DeletePlcData(plc))">Delete</button></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6"><strong>No products available</strong></td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row m-5">
+        <div class="col-5 bg-light m-2 justify-content-start">
+
+            <div class="p-3 mb-3 bg-primary text-white text-center">Add New Product</div>
+
+            <EditForm Model="@NewPlc">
+                <div class="form-group">
+                    <label for="ip">PLC IP</label>
+                    <input type="text" id="ip" class="form-control" @bind-value="@NewPlc.IpAddress" />
+                </div>
+
+                <div class="form-group">
+                    <label for="rack">Rack</label>
+                    <input type="text" id="rack" class="form-control" @bind="@NewPlc.Rack" />
+                </div>
+
+                <div class="form-group">
+                    <label for="slot">Slot</label>
+                    <input type="text" id="slot" class="form-control" @bind="@NewPlc.Slot" />
+                </div>
+
+                <div class="text-center p-3 mb-3">
+                    <button class="btn btn-info" @onclick="AddNewPlc"> Add Product</button>
+                </div>
+            </EditForm>
+        </div>
+
+        <div class="col-5 bg-light m-2 justify-content-end">
+            <div class="p-3 mb-1 bg-primary text-white text-center">Update Product</div>
+
+            <EditForm Model="@UpdatePlc">
+                <div class="form-group">
+                    <label for="ip">PLC IP</label>
+                    <input type="text" id="name" class="form-control" @bind-value="@NewPlc.IpAddress" />
+                </div>
+
+                <div class="form-group">
+                    <label for="rack">Rack</label>
+                    <input type="text" id="Rack" class="form-control" @bind="@NewPlc.Rack" />
+                </div>
+
+                <div class="form-group">
+                    <label for="slot">Slot</label>
+                    <input type="text" id="slot" class="form-control" @bind="@NewPlc.Slot" />
+                </div>
+
+                <div class="text-center p-3 mb-3">
+                    <button class="btn btn-info" @onclick="UpdatePlcData"> Update Product</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+
+</div>
+
+@code { private PlcVm PlcList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PlcList = await Mediator.Send(new GetPlcsQuery());
+    }
+
+
+    public PlcDto NewPlc { get; set; } = new PlcDto();
+
+    private async Task AddNewPlc()
+    {
+        CreatePlcCommand command = new CreatePlcCommand();
+        command.IpAddress = NewPlc.IpAddress;
+        command.Rack = NewPlc.Rack;
+        command.Slot = NewPlc.Slot;
+
+        await Mediator.Send(command);
+        NewPlc = new PlcDto();
+        await RefreshProducts();
+    }
+
+private async Task RefreshProducts()
+{
+    PlcList = await Mediator.Send(new GetPlcsQuery());
+}
+
+PlcDto UpdatePlc = new PlcDto();
+private void SetPlcForUpdate(PlcDto plc)
+{
+    UpdatePlc = plc;
+}
+
+private async Task UpdatePlcData()
+{
+@*        await service.UpdateProductAsync(UpdateProduct);
+        await RefreshProducts();*@
+    }
+
+    private async Task DeletePlcData(PlcDto plc)
+    {
+@*        await service.DeleteProductAsync(product);
+        await RefreshProducts();*@
+    }
+
+}

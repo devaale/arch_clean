@@ -1,0 +1,53 @@
+﻿@page "/"
+
+@using MediatR
+@using Clean_Architecture.Application.TodoLists.Queries.GetTodos
+
+@inject IMediator Mediator
+
+<div class="container">
+
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                @foreach (var list in todoList.Lists)
+                {
+                <tr>
+                    <th>List ID</th>
+                    <th>List Title</th>
+                    @foreach (var item in list.Items)
+                    {
+                        <th>Item ID</th>
+                        <th>List FK ID</th>
+                        <th>Item Note</th>
+                    }
+                </tr>
+                }
+            </thead>
+            <tbody>
+                @foreach (var list in todoList.Lists)
+                {
+                <tr>
+                    <th>@list.Id</th>
+                    <th>@list.Title</th>
+                    @foreach (var item in list.Items)
+                    {
+                        <th>@item.Id</th>
+                        <th>@item.ListId</th>
+                        <th>@item.Title</th>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private TodosVm todoList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        todoList = await Mediator.Send(new GetTodosQuery());
+    }
+}
